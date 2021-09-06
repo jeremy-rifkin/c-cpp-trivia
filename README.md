@@ -16,6 +16,20 @@ This repository is a collection of neat C & C++ trivia and oddities.
 # C
 
 - Source code of [the very first C compiler](https://github.com/mortdeus/legacy-cc).
+- A significant subset of possible identifiers are reserved in C++. These include identifiers which
+  begin with `is` or `to`, `str`, or `mem` followed by a lowercase letter in the global scope. It's
+  undefined to declare/define a one of these reserved identifiers in the global scope. So, the
+  following program may 1) print 1, 2) wipe your hard drive, 3) summon cthulhu, 4) other. All are
+  behaviors are equally correct.
+```cpp
+#include <stdio.h>
+int iseven(int n) {
+    return n % 2 == 0;
+}
+int main() {
+    printf("%d", iseven(2));
+}
+````
 
 # C++
 
