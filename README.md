@@ -12,6 +12,21 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - `sizeof(0)["abcd"]` is `1`.
 - `https://www.google.com` is a valid line of C/C++ code, but you're limited to one occurrence of
   each protocol per function.
+- Unknown attributes are ignored without causing an error (since C++17 and C23). This allows all
+  sorts of attribute nonsense:
+```cpp
+[[std::vector]] void foo() {}
+[[code::blocks]] void foo() {}
+[[foo...]] void foo() {}
+[[]] void foo() {}
+[[,]] void foo() {}
+[[]][[]][[]][[]][[]] void foo() {}
+[[using std:]] void foo() {}
+[[typedef ::long]] void foo() {}
+[[
+#include "/proc/cpuinfo"
+]] void foo() {}
+```
 
 # C
 
