@@ -27,6 +27,10 @@ This repository is a collection of neat C & C++ trivia and oddities.
 #include "/proc/cpuinfo"
 ]] void foo() {}
 ```
+- The operand of the `sizeof` operator cannot be a C-style cast. `sizeof (int)*p` is parsed as
+  `(sizeof(int)) * p` rather than `sizeof((int)*p)`.
+- Precedence is ignored in the conditional operator between `?` and `:`:
+  `c ? a = 1, y = 2 : foo();` is parsed as `c ? (a = 1, y = 2) : foo();`.
 
 # C
 
