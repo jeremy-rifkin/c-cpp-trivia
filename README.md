@@ -31,6 +31,7 @@ This repository is a collection of neat C & C++ trivia and oddities.
   `(sizeof(int)) * p` rather than `sizeof((int)*p)`.
 - Precedence is ignored in the conditional operator between `?` and `:`:
   `c ? a = 1, y = 2 : foo();` is parsed as `c ? (a = 1, y = 2) : foo();`.
+- `llU` is a valid (non-user-defined) integer suffix
 
 # C
 
