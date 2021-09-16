@@ -58,3 +58,18 @@ int main() {
   [#2](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101213).
 - Prior to gcc 10, `decltype(decltype(decltype))` could be used to generate [exponential error
   messages](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92105).
+- `typedef int i = 0;` segfaults msvc
+- The following are valid C++ statements:
+```cpp
+if(; true) { ... }
+if(false; true) { ... }
+if(auto main() -> int; true) { ... }
+if(class foobar; true) { ... }
+```
+- We cannot, however, do any of the following:
+```cpp
+if(static_assert(true); true) { ... }
+if(using namespace std; true) { ... }
+if(extern "C" int puts(const char*); true) { puts("hello world"); }
+if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
+```
