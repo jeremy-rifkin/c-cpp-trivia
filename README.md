@@ -59,6 +59,7 @@ int main() {
 - Prior to gcc 10, `decltype(decltype(decltype))` could be used to generate [exponential error
   messages](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92105).
 - `typedef int i = 0;` segfaults msvc
+- The size of an empty struct is `1`.
 - The following are valid C++ statements:
 ```cpp
 if(; true) { ... }
