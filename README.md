@@ -1,6 +1,12 @@
 This repository is a collection of neat C & C++ trivia and oddities.
 
-# Both languages
+### Table of contents: <!-- omit in toc -->
+- [Both languages](#both-languages)
+	- ["Special operators"](#special-operators)
+- [C](#c)
+- [C++](#c-1)
+
+## Both languages
 
 - `0` is technically tokenized as an octal literal.
 - `0XE+2` should evaluate to `16`, however, both gcc and clang give an error: `invalid suffix "+2"
@@ -13,7 +19,7 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - `https://www.google.com` is a valid line of C/C++ code, but you're limited to one occurrence of
   each protocol per function.
 - Unknown attributes are ignored without causing an error (since C++17 and C23). This allows all
-  sorts of attribute nonsense:
+  sorts of attribute nonsense (And all of these can of course be applied to variables too):
 ```cpp
 [[std::vector]] void foo() {}
 [[code::blocks]] void foo() {}
@@ -32,8 +38,53 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - Precedence is ignored in the conditional operator between `?` and `:`:
   `c ? a = 1, y = 2 : foo();` is parsed as `c ? (a = 1, y = 2) : foo();`.
 - `llU` is a valid (non-user-defined) integer suffix
+- Preprocessor directives can be empty:
+```c
+#include <stdio.h>
+#
+#
+int main() {
+	#
+	// ...
+}
+```
+- Switch statement bodies are allowed to be single statements as opposed to statement sequences (or compound statements), like other control flow structures:
+```cpp
+switch(x) case 1: case 2: puts("foo");
+```
+- Case labels do not need to be in the top-level statement sequence
+```cpp
+int x = 2;
+int i = 0;
+switch(x) {
+	default:
+	if(foo()) {
+		while(i++ < 5) {
+			case 2:
+				puts("lol");
+		}
+	}
+}
+```
+- `"a" + 1 == ""` can technically evaluate to `true`. As can `"a" == "a\0\0"`.
+### "Special operators"
+- ["`-->` operator"](https://stackoverflow.com/q/1642028/15675011), really just a
+  combination of two operators
+```cpp
+int x = 10;
+while (x --> 0) { // x goes to 0
+	printf("%d ", x);
+}
+```
+- ["Tadpole operator"](https://devblogs.microsoft.com/oldnewthing/20150525-00/?p=45044):
 
-# C
+Syntax | Meaning | Mnemonic
+-------|---------|---------
+-~y    | y + 1   | Tadpole swimming toward a value makes it bigger
+~-y    | y - 1   | Tadpole swimming away from a value makes it smaller
+- "Unset operator": `x &~ mask` unsets `mask` bits in `x`
+
+## C
 
 - Source code of [the very first C compiler](https://github.com/mortdeus/legacy-cc).
 - A significant subset of possible identifiers are reserved in C++. These include identifiers which
@@ -49,9 +100,13 @@ int iseven(int n) {
 int main() {
     printf("%d", iseven(2));
 }
-````
+```
+- gcc allows completely empty case labels (in C mode only):
+```c
+switch(x) { case 1: }
+```
 
-# C++
+## C++
 
 - `decltype(std)` is an `int` in gcc. Bug reports:
   [#1](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100482),
@@ -60,12 +115,22 @@ int main() {
   messages](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92105).
 - `typedef int i = 0;` segfaults msvc
 - The size of an empty struct is `1`.
+- A lambda's parameter list can be omitted: `[]{ return 42; }`.
+- All types must be deduced the same in an `auto` declarator list. I.e. `auto x = 1, y = 1.5;` is
+  not allowed.
+- The following is valid (since C++23)
+```cpp
+[] [[deprecated]] [[deprecated]] {}; // self-deprecating lambda
+```
 - The following are valid C++ statements:
 ```cpp
 if(; true) { ... }
 if(false; true) { ... }
 if(auto main() -> int; true) { ... }
 if(class foobar; true) { ... }
+if(typedef int i32; true) { ... }
+if(using A = B; true) { ... } // Since C++23
+for(struct { int a = 0, b = 100; } s; s.a < s.b; s.a++, s.b--) { ... }
 ```
 - We cannot, however, do any of the following:
 ```cpp
@@ -74,3 +139,15 @@ if(using namespace std; true) { ... }
 if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
+- This compiles in gcc
+```cpp
+namespace foobar {
+    extern "C" int main() {
+        puts("Hello world!");
+    }
+}
+```
+- There are special rules for lexing `<:` digraphs so that `std::vector<::std::string>` is lexed
+  correctly and not as `std::vector[:std::string>`:
+> Otherwise, if the next three characters are <​::​ and the subsequent character is neither : nor >, the < is treated as a preprocessing token by itself and not as the first character of the alternative token <:
+[https://eel.is/c++draft/lex.pptoken#3.2](https://eel.is/c++draft/lex.pptoken#3.2)
