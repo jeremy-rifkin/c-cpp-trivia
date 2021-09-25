@@ -8,6 +8,7 @@ This repository is a collection of neat C & C++ trivia and oddities.
 	- [Bugs and Implementation Quirks](#bugs-and-implementation-quirks-1)
 - [C++](#c-1)
 	- [Bugs and Implementation Quirks](#bugs-and-implementation-quirks-2)
+- [Talks](#talks)
 
 ## Both languages
 
@@ -38,6 +39,18 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - Precedence is ignored in the conditional operator between `?` and `:`:
   `c ? a = 1, y = 2 : foo();` is parsed as `c ? (a = 1, y = 2) : foo();`.
 - `llU` is a valid (non-user-defined) integer suffix
+- `(void)` cast
+```c
+void foo(int x) {
+	(void)x; // useful for suppressing unused parameter warnings
+	return (void)"You can also return anything from a void function";
+}
+```
+- You cannot augment a typedef (or `using` alias) with `unsigned`:
+```c
+typedef long long ll
+void foo(unsigned ll) {} // unsigned implies unsigned int, ll here is a parameter name
+```
 - Preprocessor directives can be empty:
 ```c
 #include <stdio.h>
@@ -114,7 +127,7 @@ int main() {
 }
 ```
 ### Bugs and Implementation Quirks
-- gcc allows completely empty case labels (in C mode only):
+- gcc allows completely empty case labels (C only):
 ```c
 switch(x) { case 1: }
 ```
@@ -161,6 +174,27 @@ T foo((T()));
 ```cpp
 struct S { ;;;;; };
 ```
+- [Function try-blocks](https://en.cppreference.com/w/cpp/language/function-try-block) are a
+  convenient way to wrap an entire function body with exception handlers and the only way to catch
+  exceptions in member initializer lists:
+```cpp
+template<typename T> struct S {
+    T t;
+    S(const T& t) try : t(t) {
+        ...
+    } catch(...) {
+        ...
+    }
+};
+```
+- You can write `extern "C++"` as well as `extern "C"`, these are the only two standard linkage
+  languages, but others can be defined by the implementation. Give us `extern "Python"` and
+  `extern "Java"`!
+- A declaration can have arbitrarily many linkage language specifiers:
+```cpp
+extern "C" extern "C++" extern "C" extern "C++" void foo(int) {}
+```
+The innermost specification is used ([standard](https://eel.is/c++draft/dcl.link#5.sentence-2)).
 - The language grammar allows `for`-style `init-statement`s in `switch` and `if` statements, Since
   C++17:
 ```cpp
@@ -232,3 +266,17 @@ namespace foobar {
     }
 }
 ```
+- Compiler can't decide which is correct, both are rejected by gcc:
+```cpp
+extern extern "C" extern "C++" int x; // accepted by clang (with warning)
+extern "C" extern "C++" extern int x; // accepted by cland (with warning) and msvc (no warning)
+```
+GCC is correct. The second is more correct due to `linkage-specification`s, but, it's disallowed to
+specify a storage class in a `linkage-specificaiton`
+([standard](https://eel.is/c++draft/dcl.link#8.sentence-2)).
+
+## Talks
+Some talks about C++ oddities:
+- [https://www.youtube.com/watch?v=Pt6oeIpzue4](https://www.youtube.com/watch?v=Pt6oeIpzue4)
+- [https://www.youtube.com/watch?v=tsG95Y-C14k](https://www.youtube.com/watch?v=tsG95Y-C14k)
+- [https://www.youtube.com/watch?v=rNNnPrMHsAA](https://www.youtube.com/watch?v=rNNnPrMHsAA)
