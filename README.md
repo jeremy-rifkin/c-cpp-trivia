@@ -152,7 +152,8 @@ T foo();
 // Most vexing parse: This is still a function declaration (taking a T(*)())
 T foo(T());
 // "More vexing parse":
-T foo(T(()));
+T foo(T((()))); // This is also a function declaration taking a T(*)()
+T foo(T (((a)))); // this is a function declaration taking a T
 // This is a variable definition
 T foo((T()));
 ```
