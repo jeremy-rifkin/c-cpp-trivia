@@ -115,12 +115,16 @@ int main() {
 ```c
 switch(x) { case 1: }
 ```
+- gcc allows labels to be applied to declarations
+```c
+switch(x) { default: int y; }
+switch(x) { default:; int y; } // must be this in clang
+```
 
 ## C++
 
 - The size of an empty struct is `1`. Standard
   [link](https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2).
-- A lambda's parameter list can be omitted: `[]{ return 42; }`.
 - All types must be deduced the same in an `auto` declarator list. I.e. `auto x = 1, y = 1.5;` is
   not allowed.
 - C++ structs can have stray semicolons:
@@ -165,6 +169,9 @@ if(using namespace std; true) { ... }
 if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
+- A lambda's parameter list can be omitted: `[]{ return 42; }`.
+- `(*****+***+**+*+[]{})();` is valid C++. Global operators `T& operator*(T*)` and
+  `T* operator+(T*)` can be used on lambdas with no captures (which decay to function pointers).
 - The following is valid (since C++23)
 ```cpp
 [] [[deprecated]] [[deprecated]] {}; // self-deprecating lambda
