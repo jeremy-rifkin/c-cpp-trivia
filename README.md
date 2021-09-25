@@ -68,6 +68,9 @@ switch(x) {
 }
 ```
 - `"a" + 1 == ""` can technically evaluate to `true`. As can `"a" == "a\0\0"`.
+- C and C++ support a set of
+  [digraph and trigraph](https://en.wikipedia.org/wiki/Digraphs_and_trigraphs#C) tokens to
+  accommodate certain archaic keyboards. Trigraphs were removed from C++ in C++17.
 ### "Special operators"
 - ["`-->` operator"](https://stackoverflow.com/q/1642028/15675011), really just a
   combination of two operators
@@ -127,6 +130,32 @@ switch(x) { default:; int y; } // must be this in clang
   [link](https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2).
 - All types must be deduced the same in an `auto` declarator list. I.e. `auto x = 1, y = 1.5;` is
   not allowed.
+- C++ supports a set of alternative tokens such as `and`, `or`, `bitand`, `compl`, etc. which are
+  equivalent to their primary counterparts. Truly, equivalent:
+```cpp
+struct S {
+	S() = default;
+	S(const S bitand) = delete;
+	S(S and) = delete;
+	compl S() = default;
+}
+void foo() {
+    char b[sizeof(S)];
+    new (&b) S();
+    ((S*)b)->compl S();
+}
+```
+- Vexing parse:
+```cpp
+// Vexing parse: This isn't a variable, it's a function declaration
+T foo();
+// Most vexing parse: This is still a function declaration (taking a T(*)())
+T foo(T());
+// "More vexing parse":
+T foo(T(()));
+// This is a variable definition
+T foo((T()));
+```
 - C++ structs can have stray semicolons:
 ```cpp
 struct S { ;;;;; };
