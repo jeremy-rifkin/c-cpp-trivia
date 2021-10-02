@@ -16,8 +16,20 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - Array access is commutative: `arr[i]` and `i[arr]` are equivalent. This is because array access is
   defined as a direct translation to `*(arr + i)`.
 - `sizeof(0)["abcd"]` is `1`.
+- C and C++ grammar allows prototypes in declaration lists: `int a, foo(), * bar(), main();`.
 - `https://www.google.com` is a valid line of C/C++ code, but you're limited to one occurrence of
   each protocol per function.
+- Operator precedence and associativity is *not* the same as order of evaluation. The following are
+  all undefined or unspecified behavior:
+```cpp
+void foo(int i, int* arr) {
+    i = i++; // UB
+    i = i++ + ++i; // UB
+    arr[i] = i++; // UB
+    bar(puts("a"), puts("b")); // clang spits out a b, gcc spits out b a
+}
+```
+[https://en.cppreference.com/w/cpp/language/eval_order](https://en.cppreference.com/w/cpp/language/eval_order)
 - Unknown attributes are ignored without causing an error (since C++17 and C23). This allows all
   sorts of attribute nonsense (And all of these can of course be applied to variables too):
 ```cpp
@@ -34,6 +46,12 @@ This repository is a collection of neat C & C++ trivia and oddities.
 [[foo...]] void foo() {}
 [[using std:]] void foo() {}
 ```
+- Attributes may appear almost anywhere in a declaration:
+```cpp
+[[foo]] int [[bar]] baz [[biz]] () [[buz]];
+[[foo]] constexpr [[bar]] int [[baz]] biz [[buz]] () [[boz]];
+// ^ second one is gcc and msvc only, decl-specifier-spec technically prevents an attribute here
+```
 - The operand of the `sizeof` operator cannot be a C-style cast. `sizeof (int)*p` is parsed as
   `(sizeof(int)) * p` rather than `sizeof((int)*p)`.
 - Precedence is ignored in the conditional operator between `?` and `:`:
@@ -42,8 +60,8 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - `(void)` cast
 ```c
 void foo(int x) {
-	(void)x; // useful for suppressing unused parameter warnings
-	return (void)"You can also return anything from a void function";
+    (void)x; // useful for suppressing unused parameter warnings
+    return (void)"You can also return anything from a void function";
 }
 ```
 - You cannot augment a typedef (or `using` alias) with `unsigned`:
@@ -57,8 +75,8 @@ void foo(unsigned ll) {} // unsigned implies unsigned int, ll here is a paramete
 #
 #
 int main() {
-	#
-	// ...
+    #
+    // ...
 }
 ```
 - Switch statement bodies are allowed to be single statements as opposed to statement sequences (or
@@ -71,13 +89,13 @@ switch(x) case 1: case 2: puts("foo");
 int x = 2;
 int i = 0;
 switch(x) {
-	default:
-	if(foo()) {
-		while(i++ < 5) {
-			case 2:
-				puts("lol");
-		}
-	}
+    default:
+    if(foo()) {
+        while(i++ < 5) {
+            case 2:
+                puts("lol");
+        }
+    }
 }
 ```
 - `"a" + 1 == ""` can technically evaluate to `true`. As can `"a" == "a\0\0"`.
@@ -90,7 +108,7 @@ switch(x) {
 ```cpp
 int x = 10;
 while (x --> 0) { // x goes to 0
-	printf("%d ", x);
+    printf("%d ", x);
 }
 ```
 - ["Tadpole operator"](https://devblogs.microsoft.com/oldnewthing/20150525-00/?p=45044):
@@ -100,24 +118,26 @@ Syntax | Meaning | Mnemonic
 -~y    | y + 1   | Tadpole swimming toward a value makes it bigger
 ~-y    | y - 1   | Tadpole swimming away from a value makes it smaller
 - "Unset operator": `x &~ mask` unsets `mask` bits in `x`
+- Boolean identity: `!-!b`
+
 ### Bugs and Implementation Quirks
 - `0XE+2` should evaluate to `16`, however, both gcc and clang give an error: `invalid suffix "+2"
   on integer constant`. Both bugs are known:
   [gcc](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63337),
   [clang](https://bugs.llvm.org/show_bug.cgi?id=26910). MSVC handles it correctly. This may be due
-  to the definition of `pp-number`s and is mentioned in the
-  [standard](https://eel.is/c++draft/lex.pptoken#example-2).
+  to the definition of `pp-number`s and is mentioned in the standard
+  [https://eel.is/c++draft/lex.pptoken#example-2](https://eel.is/c++draft/lex.pptoken#example-2).
 
 ## C
 
 - Source code of [the very first C compiler](https://github.com/mortdeus/legacy-cc).
 - An empty struct is UB in C. Standard quote: 6.7.2.1.8 (C11-C23).
-- A significant subset of possible identifiers are reserved in C++. These include identifiers which
+- A significant subset of possible identifiers are reserved in C. These include identifiers which
   begin with `is` or `to`, `str`, or `mem` followed by a lowercase letter in the global scope. It's
   undefined to declare/define a one of these reserved identifiers in the global scope. So, the
   following program may 1) print 1, 2) wipe your hard drive, 3) summon cthulhu, 4) other. All are
   behaviors are equally correct.
-```cpp
+```c
 #include <stdio.h>
 int iseven(int n) {
     return n % 2 == 0;
@@ -126,6 +146,17 @@ int main() {
     printf("%d", iseven(2));
 }
 ```
+- Expressions in parameter declarations are evaluated by gcc/clang. Due to sequencing this prints
+  number 1-10:
+```c
+#include <stdio.h>
+int first = 0;
+int main();
+int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
+    printf("%d\n", first--);
+}
+```
+- `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
 ### Bugs and Implementation Quirks
 - gcc allows completely empty case labels (C only):
 ```c
@@ -136,21 +167,31 @@ switch(x) { case 1: }
 switch(x) { default: int y; }
 switch(x) { default:; int y; } // must be this in clang
 ```
+- This compiles [without error](https://godbolt.org/z/471Eh7sGc) in TCC
+```c
+static inline int foo(void) {
+    [[[[[[[[{{(}));
+}
+int main(void) {
+    return _Generic(1, int:0, float:((}}]]]);
+}
+```
 
 ## C++
 
-- The size of an empty struct is `1`. Standard
-  [link](https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2).
+- The size of an empty struct is `1`. This is because the C++ memory model guarantees disjoint
+  storages (and thus disjoint addresses) for all distinct objects.
+  [https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2](https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2)
 - All types must be deduced the same in an `auto` declarator list. I.e. `auto x = 1, y = 1.5;` is
   not allowed.
 - C++ supports a set of alternative tokens such as `and`, `or`, `bitand`, `compl`, etc. which are
   equivalent to their primary counterparts. Truly, equivalent:
 ```cpp
 struct S {
-	S() = default;
-	S(const S bitand) = delete;
-	S(S and) = delete;
-	compl S() = default;
+    S() = default;
+    S(const S bitand) = delete;
+    S(S and) = delete;
+    compl S() = default;
 }
 void foo() {
     char b[sizeof(S)];
@@ -187,6 +228,11 @@ template<typename T> struct S {
     }
 };
 ```
+- `noexcept` is both a specifier and operator
+```cpp
+void foo() noexcept(noexcept(noexcept(true))) {}
+```
+- `throw()` is the same as `noexcept` since C++17.
 - You can write `extern "C++"` as well as `extern "C"`, these are the only two standard linkage
   languages, but others can be defined by the implementation. Give us `extern "Python"` and
   `extern "Java"`!
@@ -194,12 +240,14 @@ template<typename T> struct S {
 ```cpp
 extern "C" extern "C++" extern "C" extern "C++" void foo(int) {}
 ```
-The innermost specification is used ([standard](https://eel.is/c++draft/dcl.link#5.sentence-2)).
+The innermost specification is used. [https://eel.is/c++draft/dcl.link#5.sentence-2](https://eel.is/c++draft/dcl.link#5.sentence-2)
 - The language grammar allows `for`-style `init-statement`s in `switch` and `if` statements, Since
   C++17:
 ```cpp
 switch(int x = foo(); t[x]) { ... }
 if(auto [a, b, c] = foo(); c) { ... }
+// ranged for allows an init-statement too (just no iteration-expression)
+for(auto [vec, map] = foo.bar(); const auto& item : vec) { ... }
 ```
 - `while` loops do not support `init-statement`s because that would make them
   [just another for loop](https://stackoverflow.com/a/59986173/15675011).
@@ -246,11 +294,38 @@ if(friend void operator<<(); true) { ... } // syntactically valid, not semantica
 [[likely]] {};
 [[likely]] 1 + 2;
 ```
+- `final`, `override`, `import`, and `module` aren't keywords but have special meaning in certain
+  contexts. Thus, this is valid C++:
+```cpp
+struct final final {
+    virtual final override() final { return {}; }
+};
+void final() {
+    struct final typedef override;
+    struct final final = override().override();
+}
+```
+[https://eel.is/c++draft/lex.name#2](https://eel.is/c++draft/lex.name#2)
 - There are special rules for lexing `<:` digraphs so that `std::vector<::std::string>` is lexed
   correctly and not as `std::vector[:std::string>`:
-> Otherwise, if the next three characters are <​::​ and the subsequent character is neither : nor >, the < is treated as a preprocessing token by itself and not as the first character of the alternative token <:
+> Otherwise, if the next three characters are <​::​ and the subsequent character is neither : nor >,
+> the < is treated as a preprocessing token by itself and not as the first character of the
+> alternative token <:
 
 [https://eel.is/c++draft/lex.pptoken#3.2](https://eel.is/c++draft/lex.pptoken#3.2)
+- `std::numeric_limits<T>::max` and related functions are functions because there was originally
+  concern that some values may not be available at compile time. E.g.
+  `std::numeric_limits<float>::min` which was dependant on rounding mode. These functions are
+  `constexpr` since C++11 but at that point it was too late to change them from functions.
+- The original proposed syntax for lambdas looked like `<>(int x) : [y] (x + y)`
+  (what's now `[y](int x) { return x + y; }`). `<&>(x) ( x * y )` or
+  `<&>(x) -> int { return x * y; }` would have been the syntax for `[&](auto x) { return x * y; }`.
+  Also, in the original proposal there was no mutable keyword for lambdas. Instead the call operator
+  was always const and captures were always marked mutable. Initial proposal papers:
+  [N1958](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1958.pdf),
+  [N1968](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf),
+  [N2329 (N1968 rev 1)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2329.pdf).
+
 ### Bugs and Implementation Quirks
 - `decltype(std)` is an `int` in gcc. Bug reports:
   [#1](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100482),
@@ -273,10 +348,18 @@ extern "C" extern "C++" extern int x; // accepted by cland (with warning) and ms
 ```
 GCC is correct. The second is more correct due to `linkage-specification`s, but, it's disallowed to
 specify a storage class in a `linkage-specificaiton`
-([standard](https://eel.is/c++draft/dcl.link#8.sentence-2)).
+[https://eel.is/c++draft/dcl.link#8.sentence-2](https://eel.is/c++draft/dcl.link#8.sentence-2).
+- Double `[[gnu::constructor]]`'s are ignored but they are still allowed on `main` so hello world
+  prints twice here.
+```cpp
+[[gnu::constructor]] [[gnu::constructor]] int main() {
+    puts("Hello, World!");
+}
+```
 
 ## Talks
 Some talks about C++ oddities:
-- [https://www.youtube.com/watch?v=Pt6oeIpzue4](https://www.youtube.com/watch?v=Pt6oeIpzue4)
-- [https://www.youtube.com/watch?v=tsG95Y-C14k](https://www.youtube.com/watch?v=tsG95Y-C14k)
-- [https://www.youtube.com/watch?v=rNNnPrMHsAA](https://www.youtube.com/watch?v=rNNnPrMHsAA)
+- [Fun with (user-defined) attributes](https://youtu.be/Pt6oeIpzue4)
+- [Can I has grammar?](https://youtu.be/tsG95Y-C14k)
+- [C++ WAT](https://youtu.be/rNNnPrMHsAA)
+- [Non-conforming C++: the Secrets the Committee Is Hiding From You](https://youtu.be/IAdLwUXRUvg)
