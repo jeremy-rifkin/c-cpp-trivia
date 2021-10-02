@@ -61,6 +61,7 @@ void foo(int i, int* arr) {
 ```c
 void foo(int x) {
     (void)x; // useful for suppressing unused parameter warnings
+	// C++ only: (will be a warning with -Wpedantic)
     return (void)"You can also return anything from a void function";
 }
 ```
