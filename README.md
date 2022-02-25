@@ -103,7 +103,7 @@ switch(x) {
 - C and C++ support a set of
   [digraph and trigraph](https://en.wikipedia.org/wiki/Digraphs_and_trigraphs#C) tokens to
   accommodate certain archaic keyboards. Trigraphs were removed from C++ in C++17.
-- ISO C forbids conversion of a function pointer to an object pointer type:
+- ISO C forbids conversion between a function and object pointers:
   ```cpp
   void (*func_ptr)() = dlsym(mylib, "func"); // gcc yields a warning with standard C17 in pedantic mode
   ```
