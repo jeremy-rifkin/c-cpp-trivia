@@ -70,6 +70,10 @@ void foo(int x) {
 typedef long long ll
 void foo(unsigned ll) {} // unsigned implies unsigned int, ll here is a parameter name
 ```
+- `typedef` is a storage class specifier and can appear before, after, or in the middle of a type in a declaration
+```c
+unsigned typedef int u32;
+```
 - Preprocessor directives can be empty:
 ```c
 #include <stdio.h>
@@ -347,6 +351,13 @@ int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
 }
 ```
 - `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
+- `extern cosnt void x;` is valid a valid declaration in C for the same reason `extern struct S s;` is valid - `void` is
+  an incomplete type
+  - This is not valid in C++ because... TODO
+- The following is valid C:
+```c
+signed _Noreturn const long volatile long static _Atomic inline f(void);
+```
 
 ### Bugs and Implementation Quirks
 - gcc allows completely empty case labels (C only):
