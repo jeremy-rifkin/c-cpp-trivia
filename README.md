@@ -2,12 +2,12 @@ This repository is a collection of neat C & C++ trivia and oddities.
 
 ### Table of contents: <!-- omit in toc -->
 - [Both languages](#both-languages)
-	- ["Special operators"](#special-operators)
-	- [Bugs and Implementation Quirks](#bugs-and-implementation-quirks)
-- [C](#c)
-	- [Bugs and Implementation Quirks](#bugs-and-implementation-quirks-1)
-- [C++](#c-1)
-	- [Bugs and Implementation Quirks](#bugs-and-implementation-quirks-2)
+  - ["Special operators"](#special-operators)
+  - [Bugs and Implementation Quirks](#bugs-and-implementation-quirks)
+- [C++](#c)
+  - [Bugs and Implementation Quirks](#bugs-and-implementation-quirks-1)
+- [C](#c-1)
+  - [Bugs and Implementation Quirks](#bugs-and-implementation-quirks-2)
 - [Talks](#talks)
 
 ## Both languages
@@ -137,55 +137,6 @@ Syntax | Meaning | Mnemonic
   [clang](https://bugs.llvm.org/show_bug.cgi?id=26910). MSVC handles it correctly. This may be due
   to the definition of `pp-number`s and is mentioned in the standard
   [https://eel.is/c++draft/lex.pptoken#example-2](https://eel.is/c++draft/lex.pptoken#example-2).
-
-## C
-
-- Source code of [the very first C compiler](https://github.com/mortdeus/legacy-cc).
-- An empty struct is UB in C. Standard quote: 6.7.2.1.8 (C11-C23).
-- A significant subset of possible identifiers are reserved in C. These include identifiers which
-  begin with `is` or `to`, `str`, or `mem` followed by a lowercase letter in the global scope. It's
-  undefined to declare/define a one of these reserved identifiers in the global scope. So, the
-  following program may 1) print 1, 2) wipe your hard drive, 3) summon cthulhu, 4) other. All are
-  behaviors are equally correct.
-```c
-#include <stdio.h>
-int iseven(int n) {
-    return n % 2 == 0;
-}
-int main() {
-    printf("%d", iseven(2));
-}
-```
-- Expressions in parameter declarations are evaluated by gcc/clang. Due to sequencing this prints
-  number 1-10:
-```c
-#include <stdio.h>
-int first = 0;
-int main();
-int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
-    printf("%d\n", first--);
-}
-```
-- `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
-### Bugs and Implementation Quirks
-- gcc allows completely empty case labels (C only):
-```c
-switch(x) { case 1: }
-```
-- gcc allows labels to be applied to declarations
-```c
-switch(x) { default: int y; }
-switch(x) { default:; int y; } // must be this in clang
-```
-- This compiles [without error](https://godbolt.org/z/471Eh7sGc) in TCC
-```c
-static inline int foo(void) {
-    [[[[[[[[{{(}));
-}
-int main(void) {
-    return _Generic(1, int:0, float:((}}]]]);
-}
-```
 
 ## C++
 
@@ -364,6 +315,56 @@ specify a storage class in a `linkage-specificaiton`
 ```cpp
 [[gnu::constructor]] [[gnu::constructor]] int main() {
     puts("Hello, World!");
+}
+```
+
+## C
+
+- Source code of [the very first C compiler](https://github.com/mortdeus/legacy-cc).
+- An empty struct is UB in C. Standard quote: 6.7.2.1.8 (C11-C23).
+- A significant subset of possible identifiers are reserved in C. These include identifiers which
+  begin with `is` or `to`, `str`, or `mem` followed by a lowercase letter in the global scope. It's
+  undefined to declare/define a one of these reserved identifiers in the global scope. So, the
+  following program may 1) print 1, 2) wipe your hard drive, 3) summon cthulhu, 4) other. All are
+  behaviors are equally correct.
+```c
+#include <stdio.h>
+int iseven(int n) {
+    return n % 2 == 0;
+}
+int main() {
+    printf("%d", iseven(2));
+}
+```
+- Expressions in parameter declarations are evaluated by gcc/clang. Due to sequencing this prints
+  number 1-10:
+```c
+#include <stdio.h>
+int first = 0;
+int main();
+int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
+    printf("%d\n", first--);
+}
+```
+- `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
+
+### Bugs and Implementation Quirks
+- gcc allows completely empty case labels (C only):
+```c
+switch(x) { case 1: }
+```
+- gcc allows labels to be applied to declarations
+```c
+switch(x) { default: int y; }
+switch(x) { default:; int y; } // must be this in clang
+```
+- This compiles [without error](https://godbolt.org/z/471Eh7sGc) in TCC
+```c
+static inline int foo(void) {
+    [[[[[[[[{{(}));
+}
+int main(void) {
+    return _Generic(1, int:0, float:((}}]]]);
 }
 ```
 
