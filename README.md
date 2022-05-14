@@ -260,6 +260,11 @@ if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
 - `goto` is disallowed in `constexpr` functions until C++23
+- The following is a valid "hello world" implementation
+```cpp
+auto& hello_world = std::cout<<"Hello World"<<std::endl;
+int main() {}
+```
 - A lambda's parameter list can be omitted: `[]{ return 42; }`.
 - `(*****+***+**+*+[]{})();` is valid C++. Global operators `T& operator*(T*)` and
   `T* operator+(T*)` can be used on lambdas with no captures (which decay to function pointers).
@@ -363,6 +368,10 @@ int main();
 int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
     printf("%d\n", first--);
 }
+```
+- Similarly this is a valid "hello world" program in C
+```c
+int main(int, char*[puts("Hello World")]) {}
 ```
 - `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
 - `extern cosnt void x;` is valid a valid declaration in C for the same reason `extern struct S s;` is valid - `void` is
