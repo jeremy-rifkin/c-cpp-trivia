@@ -313,6 +313,12 @@ void final() {
   [N1968](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf),
   [N2329 (N1968 rev 1)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2329.pdf).
 - `std::string('0', '0')` is a string of 48 `'0'`'s, `std::string{'0', '0'}` is the string `"00"`
+- James Bond was [added to the C++ standard in C++17](https://github.com/cplusplus/draft/commit/703d892264af814a64140b17ffe2bf6ae9274dde)
+- The C++ standard contains a small poem:
+  > When writing a specialization, be careful about its location; or to make it compile will be such a trial as to
+  > kindle its self-immolation.
+
+  https://eel.is/c++draft/temp.spec#temp.expl.spec-8
 
 ### Bugs and Implementation Quirks
 - `decltype(std)` is an `int` in gcc. Bug reports:
