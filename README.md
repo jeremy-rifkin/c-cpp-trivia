@@ -116,9 +116,16 @@ switch(x) {
   void (*func_ptr)();
   *(void**)&func_ptr = dlsym(mylib, "func");
   ```
+- It's possible to declare multiple functions at once and use typedefs / using decllarations for signatures:
+```cpp
+// declares void foo(int); void* baz(float);
+void foo(int), * bar(float);
+// declares void foo(); void bar();
+typedef void fn(); // or using fn = void();
+fn foo, bar;
+```
 ### "Special operators"
-- ["`-->` operator"](https://stackoverflow.com/q/1642028/15675011), really just a
-  combination of two operators
+- ["`-->` operator"](https://stackoverflow.com/q/1642028/15675011), really just a combination of two operators
 ```cpp
 int x = 10;
 while (x --> 0) { // x goes to 0
