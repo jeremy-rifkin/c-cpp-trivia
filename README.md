@@ -386,7 +386,8 @@ int main(int, char*[puts("Hello World")]) {}
 - `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
 - `extern cosnt void x;` is valid a valid declaration in C for the same reason `extern struct S s;` is valid - `void` is
   an incomplete type
-  - This is not valid in C++ because... TODO
+  - This is not valid in C++ because incomplete types in general are not allowed in extern declarations, incomplete
+    class types are specifically explicitly permitted in [[dcl.stc]/7](https://eel.is/c++draft/dcl.stc#7)
 - The following is valid C:
 ```c
 signed _Noreturn const long volatile long static _Atomic inline f(void);
