@@ -312,6 +312,7 @@ void final() {
   [N1958](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1958.pdf),
   [N1968](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2006/n1968.pdf),
   [N2329 (N1968 rev 1)](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2329.pdf).
+- `std::string('0', '0')` is a string of 48 `'0'`'s, `std::string{'0', '0'}` is the string `"00"`
 
 ### Bugs and Implementation Quirks
 - `decltype(std)` is an `int` in gcc. Bug reports:
