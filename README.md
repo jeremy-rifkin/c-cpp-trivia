@@ -259,6 +259,7 @@ if(using namespace std; true) { ... }
 if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
+- `goto` is disallowed in `constexpr` functions until C++23
 - A lambda's parameter list can be omitted: `[]{ return 42; }`.
 - `(*****+***+**+*+[]{})();` is valid C++. Global operators `T& operator*(T*)` and
   `T* operator+(T*)` can be used on lambdas with no captures (which decay to function pointers).
