@@ -263,6 +263,8 @@ if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
 - `goto` is disallowed in `constexpr` functions until C++23
+- `static` storage local variables are not permitted in constexpr functions until C++23
+- Structured bindings can't be used in constexpr declarations
 - The following is a valid "hello world" implementation
 ```cpp
 auto& hello_world = std::cout<<"Hello World"<<std::endl;
@@ -319,6 +321,8 @@ void final() {
   > kindle its self-immolation.
 
   https://eel.is/c++draft/temp.spec#temp.expl.spec-8
+- CV qualifiers don't apply to objects [their construction is complete](https://eel.is/c++draft/class.ctor.general#5.sentence-2),
+  and relatedly there are no cv-qualified constructors
 
 ### Bugs and Implementation Quirks
 - `decltype(std)` is an `int` in gcc. Bug reports:
