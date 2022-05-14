@@ -148,6 +148,9 @@ Syntax | Meaning | Mnemonic
   [clang](https://bugs.llvm.org/show_bug.cgi?id=26910). MSVC handles it correctly. This may be due
   to the definition of `pp-number`s and is mentioned in the standard
   [https://eel.is/c++draft/lex.pptoken#example-2](https://eel.is/c++draft/lex.pptoken#example-2).
+- Clang / LLVM internally can start doing non-multiple of 8 arithmetic in its internal representation (even without the
+  use of `_ExtInt` or `_BitInt`). For example, [this code](https://godbolt.org/z/v49P6W38r) results in 33-bit arithmetic
+  as a result of the optimizer identifying the loop induction.
 
 ## C++
 
