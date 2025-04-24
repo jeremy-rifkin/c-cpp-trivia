@@ -262,7 +262,7 @@ if(using namespace std; true) { ... }
 if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
-- `goto` is disallowed in `constexpr` functions until C++23
+- `goto` is disallowed in `constexpr` functions
 - `static` storage local variables are not permitted in constexpr functions until C++23
 - Structured bindings can't be used in constexpr declarations
 - The following is a valid "hello world" implementation
