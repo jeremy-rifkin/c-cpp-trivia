@@ -105,8 +105,14 @@ switch(x) {
 ```
 - `"a" + 1 == ""` can technically evaluate to `true`. As can `"a" == "a\0\0"`.
 - C and C++ support a set of
-  [digraph and trigraph](https://en.wikipedia.org/wiki/Digraphs_and_trigraphs#C) tokens to
-  accommodate certain archaic keyboards. Trigraphs were removed from C++ in C++17.
+  [digraph tokens and trigraphs](https://en.wikipedia.org/wiki/Digraphs_and_trigraphs_(programming)#C) and [alternative tokens](https://en.wikipedia.org/wiki/C_alternative_tokens) to
+  accommodate certain [archaic character sets](https://en.wikipedia.org/wiki/ISO/IEC_646) which rendered some ASCII characters differently. `not` and `not_eq` also exist because some
+  [EBCDIC character sets](https://en.wikipedia.org/wiki/EBCDIC) didn't have a character that rendered as an exclamation mark. Trigraphs were removed from C++ in C++17 and C in C23,
+  because they were replaced before tokenization which caused some surprising behavior:
+  ```cpp
+  puts("??("); // when trigraphs are supported, this outputs [ instead of ??(
+  puts("<:"); // outputs <:, there is no way to use digraphs in character constants or string literals
+  ```
 - ISO C forbids conversion between a function and object pointers:
   ```cpp
   void (*func_ptr)() = dlsym(mylib, "func"); // gcc yields a warning with standard C17 in pedantic mode
