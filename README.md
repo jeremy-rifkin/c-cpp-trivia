@@ -84,8 +84,7 @@ int main() {
     // ...
 }
 ```
-- Switch statement bodies are allowed to be single statements as opposed to statement sequences (or
-  compound statements), like other control flow structures:
+- Switch statement bodies are allowed to be any single statement (not just compound statements), like other control flow structures:
 ```cpp
 switch(x) case 1: case 2: puts("foo");
 ```
