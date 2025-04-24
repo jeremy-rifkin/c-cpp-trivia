@@ -196,13 +196,6 @@ T foo((T()));
 ```cpp
 struct S { ;;;;; };
 ```
-- The following is The following code is probably, technically, well-formed in the current working draft of the
-  standard (and may have been before too):
-```cpp
-template<typename T> void main(T) {}
-int main() {}
-```
-  This is related to changes in P1787. Sadly, no compiler supports this.
 - [Function try-blocks](https://en.cppreference.com/w/cpp/language/function-try-block) are a
   convenient way to wrap an entire function body with exception handlers and the only way to catch
   exceptions in member initializer lists:
