@@ -123,7 +123,7 @@ switch(x) {
   *(void**)&func_ptr = dlsym(mylib, "func");
   ```
   Though this trick gets around the warning, the behavior is undefined due to strict aliasing so it may not work.
-- It's possible to declare multiple functions at once and use typedefs / using decllarations for signatures:
+- It's possible to declare multiple functions at once and use typedefs / using declarations for signatures:
 ```cpp
 // declares void foo(int); void* baz(float);
 void foo(int), * bar(float);
