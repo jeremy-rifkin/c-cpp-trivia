@@ -19,8 +19,8 @@ This repository is a collection of neat C & C++ trivia and oddities.
 - C and C++ grammar allows prototypes in declaration lists: `int a, foo(), * bar(), main();`.
 - `https://www.google.com` is a valid line of C/C++ code, but you're limited to one occurrence of
   each protocol per function.
-- Operator precedence and associativity is *not* the same as order of evaluation. The following are
-  all undefined or unspecified behavior:
+- Operator precedence and associativity is *not* the same as order of evaluation. The following examples
+  are undefined or unspecified behavior in C and some versions of C++:
 ```cpp
 void foo(int i, int* arr) {
     i = i++; // UB in C or before C++17
