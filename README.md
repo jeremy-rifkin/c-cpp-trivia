@@ -159,7 +159,7 @@ Syntax | Meaning | Mnemonic
   [https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2](https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2)
 - All types must be deduced the same in an `auto` declarator list. I.e. `auto x = 1, y = 1.5;` is
   not allowed.
-- What would be idiomatic uses of `malloc` in C are UB in C++ prior to C++23, [more details here](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p0593r6.html#idiomatic-c-code-as-c)
+- What would be idiomatic uses of `malloc` in C are UB in C++ prior to C++20, [more details here](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p0593r6.html#idiomatic-c-code-as-c)
 ```cpp
 struct S { int x; };
 S* s = malloc(sizeof(S));
