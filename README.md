@@ -14,7 +14,7 @@ This repository is a collection of neat C & C++ trivia and oddities.
 
 - `0` is technically tokenized as an octal literal.
 - Array access is commutative: `arr[i]` and `i[arr]` are equivalent. This is because array access is
-  defined as a direct translation to `*(arr + i)`.
+  defined as a direct translation to `*(arr + i)` when arr is an lvalue with array type.
 - `sizeof(0)["abcd"]` is `1`.
 - C and C++ grammar allows prototypes in declaration lists: `int a, foo(), * bar(), main();`.
 - `https://www.google.com` is a valid line of C/C++ code, but you're limited to one occurrence of
