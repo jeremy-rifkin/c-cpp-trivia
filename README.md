@@ -109,19 +109,19 @@ switch(x) {
   accommodate certain [archaic character sets](https://en.wikipedia.org/wiki/ISO/IEC_646) which rendered some ASCII characters differently. `not` and `not_eq` also exist because some
   [EBCDIC character sets](https://en.wikipedia.org/wiki/EBCDIC) didn't have a character that rendered as an exclamation mark. Trigraphs were removed from C++ in C++17 and C in C23,
   because they were replaced before tokenization which caused some surprising behavior:
-  ```cpp
-  puts("??("); // when trigraphs are supported, this outputs [ instead of ??(
-  puts("<:"); // outputs <:, there is no way to use digraphs in character constants or string literals
-  ```
+```cpp
+puts("??("); // when trigraphs are supported, this outputs [ instead of ??(
+puts("<:"); // outputs <:, there is no way to use digraphs in character constants or string literals
+```
 - ISO C forbids conversion between function and object pointers, and ISO C++ allows implementations to forbid such conversions:
-  ```cpp
-  void (*func_ptr)() = dlsym(mylib, "func"); // gcc and clang yield a warning in pedantic mode
-  ```
+```cpp
+void (*func_ptr)() = dlsym(mylib, "func"); // gcc and clang yield a warning in pedantic mode
+```
   However, if taking the address to the function pointer first, then casting to `void**` and finally dereferencing this pointer again, makes it (usually) work without warnings:
-  ```cpp
-  void (*func_ptr)();
-  *(void**)&func_ptr = dlsym(mylib, "func");
-  ```
+```cpp
+void (*func_ptr)();
+*(void**)&func_ptr = dlsym(mylib, "func");
+```
   Though this trick gets around the warning, the behavior is undefined due to strict aliasing so it may not work.
 - It's possible to declare multiple functions at once and use typedefs / using declarations for signatures:
 ```cpp
