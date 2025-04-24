@@ -113,15 +113,16 @@ switch(x) {
   puts("??("); // when trigraphs are supported, this outputs [ instead of ??(
   puts("<:"); // outputs <:, there is no way to use digraphs in character constants or string literals
   ```
-- ISO C forbids conversion between a function and object pointers:
+- ISO C forbids conversion between function and object pointers, and ISO C++ allows implementations to forbid such conversions:
   ```cpp
-  void (*func_ptr)() = dlsym(mylib, "func"); // gcc yields a warning with standard C17 in pedantic mode
+  void (*func_ptr)() = dlsym(mylib, "func"); // gcc and clang yield a warning in pedantic mode
   ```
-  However, if taking the address to the function pointer first, then casting to `void**` and finally dereferencing this pointer again, makes it work without warnings:
+  However, if taking the address to the function pointer first, then casting to `void**` and finally dereferencing this pointer again, makes it (usually) work without warnings:
   ```cpp
   void (*func_ptr)();
   *(void**)&func_ptr = dlsym(mylib, "func");
   ```
+  Though this trick gets around the warning, the behavior is undefined due to strict aliasing so it may not work.
 - It's possible to declare multiple functions at once and use typedefs / using decllarations for signatures:
 ```cpp
 // declares void foo(int); void* baz(float);
