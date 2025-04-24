@@ -23,9 +23,9 @@ This repository is a collection of neat C & C++ trivia and oddities.
   all undefined or unspecified behavior:
 ```cpp
 void foo(int i, int* arr) {
-    i = i++; // UB
+    i = i++; // UB in C or before C++17
     i = i++ + ++i; // UB
-    arr[i] = i++; // UB
+    arr[i] = i++; // UB in C or before C++17
     bar(puts("a"), puts("b")); // clang spits out a b, gcc spits out b a
 }
 ```
