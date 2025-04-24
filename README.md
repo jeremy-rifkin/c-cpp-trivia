@@ -213,7 +213,7 @@ template<typename T> struct S {
 ```cpp
 void foo() noexcept(noexcept(noexcept(true))) {}
 ```
-- `throw()` is the same as `noexcept` since C++17.
+- `throw()` is the same as `noexcept` in C++17.
 - You can write `extern "C++"` as well as `extern "C"`, these are the only two standard linkage
   languages, but others can be defined by the implementation. Give us `extern "Python"` and
   `extern "Java"`!
