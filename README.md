@@ -327,13 +327,13 @@ void final() {
 - A lambda's `operator()` is automatically `constexpr` if it meets the requirements for a constexpr function [https://eel.is/c++draft/expr.prim.lambda.closure#5.sentence-6](https://eel.is/c++draft/expr.prim.lambda.closure#5.sentence-6)
 
 ### Bugs and Implementation Quirks
-- `decltype(std)` is an `int` in gcc. Bug reports:
+- `decltype(std)` is an `int` in gcc (prior to version 14). Bug reports:
   [#1](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100482),
   [#2](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101213).
 - Prior to gcc 10, `decltype(decltype(decltype))` could be used to generate [exponential error
   messages](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92105).
 - `typedef int i = 0;` segfaults msvc
-- This compiles and links in gcc
+- This compiles and links in gcc (prior to version 15, or when compiling outside of pedantic mode)
 ```cpp
 namespace foobar {
     extern "C" int main() {
