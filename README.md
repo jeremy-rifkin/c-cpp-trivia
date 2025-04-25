@@ -387,7 +387,7 @@ int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
 ```
 - Similarly this is a valid "hello world" program in C
 ```c
-int main(int, char*[puts("Hello World")]) {}
+int main(int a, char *b[puts("Hello World") || 1]) {}
 ```
 - `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
 - `extern const void x;` is valid a valid declaration in C for the same reason `extern struct S s;` is valid - `void` is
