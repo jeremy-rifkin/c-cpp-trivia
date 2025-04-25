@@ -389,7 +389,8 @@ int main(int a, char *b[(first++ > 8) ? 1 : (main(0, 0) || 1)]) {
 ```c
 int main(int a, char *b[puts("Hello World") || 1]) {}
 ```
-- `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
+- `auto` is a keyword in C. Since C23 it can be used to deduce the type in a declaration similar to C++, but with more restrictions.
+  Before C23, its only standard use was to redundantly specify that a declaration had automatic storage duration.
 - `extern const void x;` is valid a valid declaration in C for the same reason `extern struct S s;` is valid - `void` is
   an incomplete type
   - This is not valid in C++ because incomplete types in general are not allowed in extern declarations, incomplete
