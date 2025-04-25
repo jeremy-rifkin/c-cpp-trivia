@@ -380,8 +380,8 @@ int main() {
 ```c
 #include <stdio.h>
 int first = 0;
-int main();
-int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
+int main(int, char**);
+int main(int a, char *b[(first++ > 8) ? 1 : (main(0, 0) || 1)]) {
     printf("%d\n", first--);
 }
 ```
