@@ -321,7 +321,7 @@ void final() {
   > kindle its self-immolation.
 
   https://eel.is/c++draft/temp.spec#temp.expl.spec-8
-- CV qualifiers don't apply to objects [their construction is complete](https://eel.is/c++draft/class.ctor.general#5.sentence-2),
+- CV qualifiers don't apply to objects until [their construction is complete](https://eel.is/c++draft/class.ctor.general#5.sentence-2),
   and relatedly there are no cv-qualified constructors
 - Array elements, and objects in general, are always destroyed in reverse order of construction. Standard quote for [arrays](https://eel.is/c++draft/class.dtor#14.sentence-5)
 - A lambda's `operator()` is automatically `constexpr` if it meets the requirements for a constexpr function [https://eel.is/c++draft/expr.prim.lambda.closure#5.sentence-6](https://eel.is/c++draft/expr.prim.lambda.closure#5.sentence-6)
