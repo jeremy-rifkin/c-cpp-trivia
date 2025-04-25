@@ -175,9 +175,9 @@ struct S {
     compl S() = default;
 }
 void foo() {
-    char b[sizeof(S)];
-    new (&b) S();
-    ((S*)b)->compl S();
+    alignas(S) unsigned char b[sizeof(S)];
+    new (b) S();
+    std::launder((S*)b)->compl S();
 }
 ```
 - Vexing parse:
