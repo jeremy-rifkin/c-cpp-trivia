@@ -401,14 +401,11 @@ signed _Noreturn const long volatile long static _Atomic inline f(void);
 ```
 
 ### Bugs and Implementation Quirks
-- gcc allows completely empty case labels (C only):
+- gcc allows labels before a declaration, or at the end of a compound statement before C23 without warnings:
 ```c
 switch(x) { case 1: }
-```
-- gcc allows labels to be applied to declarations
-```c
 switch(x) { default: int y; }
-switch(x) { default:; int y; } // must be this in clang
+// clang generates warnings for both, gcc generates warnings only when using pedantic
 ```
 - This compiles [without error](https://godbolt.org/z/471Eh7sGc) in TCC
 ```c
