@@ -14,18 +14,18 @@ This repository is a collection of neat C & C++ trivia and oddities.
 
 - `0` is technically tokenized as an octal literal.
 - Array access is commutative: `arr[i]` and `i[arr]` are equivalent. This is because array access is
-  defined as a direct translation to `*(arr + i)`.
+  defined as a direct translation to `*(arr + i)` when arr is an lvalue with array type.
 - `sizeof(0)["abcd"]` is `1`.
 - C and C++ grammar allows prototypes in declaration lists: `int a, foo(), * bar(), main();`.
 - `https://www.google.com` is a valid line of C/C++ code, but you're limited to one occurrence of
   each protocol per function.
-- Operator precedence and associativity is *not* the same as order of evaluation. The following are
-  all undefined or unspecified behavior:
+- Operator precedence and associativity is *not* the same as order of evaluation. The following examples
+  are undefined or unspecified behavior in C and some versions of C++:
 ```cpp
 void foo(int i, int* arr) {
-    i = i++; // UB
+    i = i++; // UB in C or before C++17
     i = i++ + ++i; // UB
-    arr[i] = i++; // UB
+    arr[i] = i++; // UB in C or before C++17
     bar(puts("a"), puts("b")); // clang spits out a b, gcc spits out b a
 }
 ```
@@ -84,8 +84,7 @@ int main() {
     // ...
 }
 ```
-- Switch statement bodies are allowed to be single statements as opposed to statement sequences (or
-  compound statements), like other control flow structures:
+- Switch statement bodies are allowed to be any single statement (not just compound statements), like other control flow structures:
 ```cpp
 switch(x) case 1: case 2: puts("foo");
 ```
@@ -105,18 +104,25 @@ switch(x) {
 ```
 - `"a" + 1 == ""` can technically evaluate to `true`. As can `"a" == "a\0\0"`.
 - C and C++ support a set of
-  [digraph and trigraph](https://en.wikipedia.org/wiki/Digraphs_and_trigraphs#C) tokens to
-  accommodate certain archaic keyboards. Trigraphs were removed from C++ in C++17.
-- ISO C forbids conversion between a function and object pointers:
-  ```cpp
-  void (*func_ptr)() = dlsym(mylib, "func"); // gcc yields a warning with standard C17 in pedantic mode
-  ```
-  However, if taking the address to the function pointer first, then casting to `void**` and finally dereferencing this pointer again, makes it work without warnings:
-  ```cpp
-  void (*func_ptr)();
-  *(void**)&func_ptr = dlsym(mylib, "func");
-  ```
-- It's possible to declare multiple functions at once and use typedefs / using decllarations for signatures:
+  [digraph tokens and trigraphs](https://en.wikipedia.org/wiki/Digraphs_and_trigraphs_(programming)#C) and [alternative tokens](https://en.wikipedia.org/wiki/C_alternative_tokens) to
+  accommodate certain [archaic character sets](https://en.wikipedia.org/wiki/ISO/IEC_646) which rendered some ASCII characters differently. `not` and `not_eq` also exist because some
+  [EBCDIC character sets](https://en.wikipedia.org/wiki/EBCDIC) didn't have a character that rendered as an exclamation mark. Trigraphs were removed from C++ in C++17 and C in C23,
+  because they were replaced before tokenization which caused some surprising behavior:
+```cpp
+puts("??("); // when trigraphs are supported, this outputs [ instead of ??(
+puts("<:"); // outputs <:, there is no way to use digraphs in character constants or string literals
+```
+- ISO C forbids conversion between function and object pointers, and ISO C++ allows implementations to forbid such conversions:
+```cpp
+void (*func_ptr)() = dlsym(mylib, "func"); // gcc and clang yield a warning in pedantic mode
+```
+  However, if taking the address to the function pointer first, then casting to `void**` and finally dereferencing this pointer again, makes it (usually) work without warnings:
+```cpp
+void (*func_ptr)();
+*(void**)&func_ptr = dlsym(mylib, "func");
+```
+  Though this trick gets around the warning, the behavior is undefined due to strict aliasing so it may not work.
+- It's possible to declare multiple functions at once and use typedefs / using declarations for signatures:
 ```cpp
 // declares void foo(int); void* baz(float);
 void foo(int), * bar(float);
@@ -142,12 +148,6 @@ Syntax | Meaning | Mnemonic
 - Boolean identity: `!-!b`
 
 ### Bugs and Implementation Quirks
-- `0XE+2` should evaluate to `16`, however, both gcc and clang give an error: `invalid suffix "+2"
-  on integer constant`. Both bugs are known:
-  [gcc](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=63337),
-  [clang](https://bugs.llvm.org/show_bug.cgi?id=26910). MSVC handles it correctly. This may be due
-  to the definition of `pp-number`s and is mentioned in the standard
-  [https://eel.is/c++draft/lex.pptoken#example-2](https://eel.is/c++draft/lex.pptoken#example-2).
 - Clang / LLVM internally can start doing non-multiple of 8 arithmetic in its internal representation (even without the
   use of `_ExtInt` or `_BitInt`). For example, [this code](https://godbolt.org/z/v49P6W38r) results in 33-bit arithmetic
   as a result of the optimizer identifying the loop induction.
@@ -159,7 +159,7 @@ Syntax | Meaning | Mnemonic
   [https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2](https://eel.is/c++draft/basic.memobj#intro.object-9.sentence-2)
 - All types must be deduced the same in an `auto` declarator list. I.e. `auto x = 1, y = 1.5;` is
   not allowed.
-- What would be idiomatic uses of `malloc` in C are UB in C++ prior to C++23, [more details here](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p0593r6.html#idiomatic-c-code-as-c)
+- What would be idiomatic uses of `malloc` in C are UB in C++ prior to C++20, [more details here](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2020/p0593r6.html#idiomatic-c-code-as-c)
 ```cpp
 struct S { int x; };
 S* s = malloc(sizeof(S));
@@ -175,9 +175,9 @@ struct S {
     compl S() = default;
 }
 void foo() {
-    char b[sizeof(S)];
-    new (&b) S();
-    ((S*)b)->compl S();
+    alignas(S) unsigned char b[sizeof(S)];
+    new (b) S();
+    std::launder((S*)b)->compl S();
 }
 ```
 - Vexing parse:
@@ -196,13 +196,6 @@ T foo((T()));
 ```cpp
 struct S { ;;;;; };
 ```
-- The following is The following code is probably, technically, well-formed in the current working draft of the
-  standard (and may have been before too):
-```cpp
-template<typename T> void main(T) {}
-int main() {}
-```
-  This is related to changes in P1787. Sadly, no compiler supports this.
 - [Function try-blocks](https://en.cppreference.com/w/cpp/language/function-try-block) are a
   convenient way to wrap an entire function body with exception handlers and the only way to catch
   exceptions in member initializer lists:
@@ -220,7 +213,7 @@ template<typename T> struct S {
 ```cpp
 void foo() noexcept(noexcept(noexcept(true))) {}
 ```
-- `throw()` is the same as `noexcept` since C++17.
+- `throw()` is the same as `noexcept` in C++17.
 - You can write `extern "C++"` as well as `extern "C"`, these are the only two standard linkage
   languages, but others can be defined by the implementation. Give us `extern "Python"` and
   `extern "Java"`!
@@ -269,7 +262,7 @@ if(using namespace std; true) { ... }
 if(extern "C" int puts(const char*); true) { puts("hello world"); }
 if(friend void operator<<(); true) { ... } // syntactically valid, not semantically valid
 ```
-- `goto` is disallowed in `constexpr` functions until C++23
+- `goto` is disallowed in `constexpr` functions
 - `static` storage local variables are not permitted in constexpr functions until C++23
 - Structured bindings can't be used in constexpr declarations
 - The following is a valid "hello world" implementation
@@ -328,19 +321,19 @@ void final() {
   > kindle its self-immolation.
 
   https://eel.is/c++draft/temp.spec#temp.expl.spec-8
-- CV qualifiers don't apply to objects [their construction is complete](https://eel.is/c++draft/class.ctor.general#5.sentence-2),
+- CV qualifiers don't apply to objects until [their construction is complete](https://eel.is/c++draft/class.ctor.general#5.sentence-2),
   and relatedly there are no cv-qualified constructors
 - Array elements, and objects in general, are always destroyed in reverse order of construction. Standard quote for [arrays](https://eel.is/c++draft/class.dtor#14.sentence-5)
 - A lambda's `operator()` is automatically `constexpr` if it meets the requirements for a constexpr function [https://eel.is/c++draft/expr.prim.lambda.closure#5.sentence-6](https://eel.is/c++draft/expr.prim.lambda.closure#5.sentence-6)
 
 ### Bugs and Implementation Quirks
-- `decltype(std)` is an `int` in gcc. Bug reports:
+- `decltype(std)` is an `int` in gcc (prior to version 14). Bug reports:
   [#1](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=100482),
   [#2](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=101213).
 - Prior to gcc 10, `decltype(decltype(decltype))` could be used to generate [exponential error
   messages](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92105).
 - `typedef int i = 0;` segfaults msvc
-- This compiles and links in gcc
+- This compiles and links in gcc (prior to version 15, or when compiling outside of pedantic mode)
 ```cpp
 namespace foobar {
     extern "C" int main() {
@@ -387,16 +380,17 @@ int main() {
 ```c
 #include <stdio.h>
 int first = 0;
-int main();
-int main(int a, char *b[(first++ > 8) ? 1 : main()]) {
+int main(int, char**);
+int main(int a, char *b[(first++ > 8) ? 1 : (main(0, 0) || 1)]) {
     printf("%d\n", first--);
 }
 ```
 - Similarly this is a valid "hello world" program in C
 ```c
-int main(int, char*[puts("Hello World")]) {}
+int main(int a, char *b[puts("Hello World") || 1]) {}
 ```
-- `auto` is a keyword in C. Not to be confused with C++ `auto`, C `auto` does absolutely nothing.
+- `auto` is a keyword in C. Since C23 it can be used to deduce the type in a declaration similar to C++, but with more restrictions.
+  Before C23, its only standard use was to redundantly specify that a declaration had automatic storage duration.
 - `extern const void x;` is valid a valid declaration in C for the same reason `extern struct S s;` is valid - `void` is
   an incomplete type
   - This is not valid in C++ because incomplete types in general are not allowed in extern declarations, incomplete
@@ -407,14 +401,11 @@ signed _Noreturn const long volatile long static _Atomic inline f(void);
 ```
 
 ### Bugs and Implementation Quirks
-- gcc allows completely empty case labels (C only):
+- gcc allows labels before a declaration, or at the end of a compound statement before C23 without warnings:
 ```c
 switch(x) { case 1: }
-```
-- gcc allows labels to be applied to declarations
-```c
 switch(x) { default: int y; }
-switch(x) { default:; int y; } // must be this in clang
+// clang generates warnings for both, gcc generates warnings only when using pedantic
 ```
 - This compiles [without error](https://godbolt.org/z/471Eh7sGc) in TCC
 ```c
